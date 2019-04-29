@@ -28,11 +28,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
 	class UPaperFlipbook* DeathAnimation;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UNMHealthComponent* HealthComponent;
+
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateAnimations();
 	void Update();
+
+	UFUNCTION()
+	void OnHealthChanged(UNMHealthComponent* HealthComp,
+		float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 public:
 

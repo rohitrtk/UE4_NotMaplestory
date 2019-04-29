@@ -6,6 +6,11 @@
 #include "Components/InputComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/BoxComponent.h"
+#include "NMHealthComponent.h"
+#include "GameFramework/Actor.h"
+#include "NMMob.h"
+#include "Kismet/GameplayStatics.h"
 
 ANMCharacter::ANMCharacter()
 {
@@ -41,11 +46,20 @@ ANMCharacter::ANMCharacter()
 	this->GetCharacterMovement()->bUseFlatBaseForFloorChecks = true;
 	this->GetCharacterMovement()->bConstrainToPlane = true;
 	this->GetCharacterMovement()->SetPlaneConstraintNormal(FVector(0.f, -1.f, 0.f));
+
+	this->AttackCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Attack Collider"));
+	this->AttackCollider->SetupAttachment(RootComponent);
+	this->AttackCollider->SetRelativeLocation(FVector(45.f, 0.f, 0.f));
+	this->AttackCollider->SetBoxExtent(FVector(24.f, 8.f, 32.f));
+
+	this->HealthComponent = CreateDefaultSubobject<UNMHealthComponent>(TEXT("Health Component"));
 }
 
 void ANMCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	this->HealthComponent->OnHealthChanged.AddDynamic(this, &ANMCharacter::OnHealthChanged);
 }
 
 void ANMCharacter::Tick(float DeltaTime)
@@ -142,6 +156,21 @@ void ANMCharacter::StopAttack()
 {
 	bIsAttacking = false;
 
+	TArray<AActor*> overlappingActors;
+	TSubclassOf<ANMMob> mobFilter;
+	TSubclassOf<UDamageType> damageType;
+
+	this->AttackCollider->GetOverlappingActors(overlappingActors, mobFilter);
+	for (const auto& a : overlappingActors)
+	{
+		ANMMob* mob = Cast<ANMMob>(a);
+		if (mob)
+		{
+			UGameplayStatics::ApplyDamage(mob, 100.f, this->GetController(), this, damageType);
+			break;
+		}
+	}
+
 	GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
 }
 
@@ -155,4 +184,10 @@ void ANMCharacter::StopProne()
 { 
 	this->bIsProne = false; 
 	this->GetCapsuleComponent()->SetCapsuleHalfHeight(CapsuleHeight);
+}
+
+
+void ANMCharacter::OnHealthChanged(class UNMHealthComponent* HealthComp,
+	float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+{
 }

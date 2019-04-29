@@ -17,6 +17,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* SpringArm;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gameplay", meta = (AllowPrivateAccess = "true"))
+	class UBoxComponent* AttackCollider;
+
 	const float CapsuleHeight = 35.f;
 	const float CapsuleProneheight = 20.f;
 
@@ -56,19 +59,25 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gameplay")
 	bool bIsProne;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UNMHealthComponent* HealthComponent;
+
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Update();
 	void MoveRight(float delta);
 	void UpdateAnimations(const FVector& velocity);
+	void Prone();
+	void StopProne();
 	void Attack();
 
 	UFUNCTION()
 	void StopAttack();
 
-	void Prone();
-	void StopProne();
+	UFUNCTION()
+	void OnHealthChanged(class UNMHealthComponent* HealthComp,
+		float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 public:
 
