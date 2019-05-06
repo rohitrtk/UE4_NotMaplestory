@@ -59,8 +59,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gameplay")
 	bool bIsProne;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	class UNMHealthComponent* HealthComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay")
+	TSubclassOf<UDamageType> DamageType;
+
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	//class UNMHealthComponent* HealthComponent;
 
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -77,7 +80,7 @@ protected:
 
 	UFUNCTION()
 	void OnHealthChanged(class UNMHealthComponent* HealthComp,
-		float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+		float Health, float HealthDelta, const class UDamageType* Damage, class AController* InstigatedBy, AActor* DamageCauser);
 
 public:
 

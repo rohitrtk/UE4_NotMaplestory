@@ -1,16 +1,17 @@
 #include "NMHealthComponent.h"
 #include "GameFramework/Actor.h"
+#include "Engine/GameEngine.h"
 
 UNMHealthComponent::UNMHealthComponent()
 {
 	this->StartingHealth = 100.f;
 }
 
-
 void UNMHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// Upon owner taking damage, call function HandleTakeAnyDamage
 	AActor* owner = this->GetOwner();
 	if (owner)
 	{
@@ -20,13 +21,14 @@ void UNMHealthComponent::BeginPlay()
 	this->CurrentHealth = this->StartingHealth;
 }
 
-void UNMHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage,
+void UNMHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float DamageDelt,
 	const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (Damage <= 0.f) return;
+	if (DamageDelt <= 0.f) return;
 
-	this->CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.f, StartingHealth);
+	this->CurrentHealth = FMath::Clamp(CurrentHealth - DamageDelt, 0.f, StartingHealth);
 
-	OnHealthChanged.Broadcast(this, CurrentHealth, Damage, DamageType, InstigatedBy, DamageCauser);
+	// Broadcast the event
+	this->OnHealthChangedSignature.Broadcast(this, CurrentHealth, DamageDelt, DamageType, InstigatedBy, DamageCauser);
 }
 

@@ -28,8 +28,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
 	class UPaperFlipbook* DeathAnimation;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	class UNMHealthComponent* HealthComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay")
+	FString Tag;
 
 	virtual void BeginPlay() override;
 
@@ -38,11 +41,13 @@ protected:
 	void Update();
 
 	UFUNCTION()
-	void OnHealthChanged(UNMHealthComponent* HealthComp,
-		float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+	void OnHealthChanged(UNMHealthComponent* HealthComp, float Health, float HealthDelta,
+		const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 public:
 
 	ANMMob();
+
+	FORCEINLINE const FString& GetTag() { return this->Tag; }
 
 };

@@ -11,6 +11,7 @@
 #include "GameFramework/Actor.h"
 #include "NMMob.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/GameEngine.h"
 
 ANMCharacter::ANMCharacter()
 {
@@ -51,15 +52,16 @@ ANMCharacter::ANMCharacter()
 	this->AttackCollider->SetupAttachment(RootComponent);
 	this->AttackCollider->SetRelativeLocation(FVector(45.f, 0.f, 0.f));
 	this->AttackCollider->SetBoxExtent(FVector(24.f, 8.f, 32.f));
+	this->AttackCollider->bAbsoluteRotation = false;
 
-	this->HealthComponent = CreateDefaultSubobject<UNMHealthComponent>(TEXT("Health Component"));
+	//this->HealthComponent = CreateDefaultSubobject<UNMHealthComponent>(TEXT("Health Component"));
 }
 
 void ANMCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	this->HealthComponent->OnHealthChanged.AddDynamic(this, &ANMCharacter::OnHealthChanged);
+	//this->HealthComponent->OnHealthChanged.AddDynamic(this, &ANMCharacter::OnHealthChanged);
 }
 
 void ANMCharacter::Tick(float DeltaTime)
@@ -158,15 +160,16 @@ void ANMCharacter::StopAttack()
 
 	TArray<AActor*> overlappingActors;
 	TSubclassOf<ANMMob> mobFilter;
-	TSubclassOf<UDamageType> damageType;
 
-	this->AttackCollider->GetOverlappingActors(overlappingActors, mobFilter);
+	this->AttackCollider->GetOverlappingActors(overlappingActors);
 	for (const auto& a : overlappingActors)
 	{
 		ANMMob* mob = Cast<ANMMob>(a);
 		if (mob)
-		{
-			UGameplayStatics::ApplyDamage(mob, 100.f, this->GetController(), this, damageType);
+		{	
+			//GEngine->AddOnScreenDebugMessage(0, 2.f, FColor::Red, mob->GetTag());
+			//UGameplayStatics::ApplyDamage(mob, 100.f, this->GetInstigatorController(), this, DamageType);
+			UGameplayStatics::ApplyDamage(mob, 100.f, GetController(), this, DamageType);
 			break;
 		}
 	}
@@ -188,6 +191,6 @@ void ANMCharacter::StopProne()
 
 
 void ANMCharacter::OnHealthChanged(class UNMHealthComponent* HealthComp,
-	float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+	float Health, float HealthDelta, const class UDamageType* Damage, class AController* InstigatedBy, AActor* DamageCauser)
 {
 }
